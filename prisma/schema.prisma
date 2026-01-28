@@ -1,0 +1,169 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  STUDENT
+  TUTOR
+  ADMIN
+}
+
+enum UserStatus {
+  ACTIVE
+  BANNED
+}
+
+enum BookingStatus {
+  CONFIRMED
+  COMPLETED
+  CANCELLED
+}
+
+// model User {
+//   id       Int        @id @default(autoincrement())
+//   name     String
+//   email    String     @unique
+//   password String
+//   role     Role
+//   status   UserStatus @default(ACTIVE)
+
+//   // tutorProfile TutorProfile?
+//   // bookings     Booking[]     @relation("StudentBookings")
+//   // reviews      Review[]
+
+//   createdAt DateTime @default(now())
+// }
+
+model TutorProfile {
+  id         Int    @id @default(autoincrement())
+  userId     Int    @unique
+  bio        String
+  pricePerHr Float
+  rating     Float  @default(0)
+
+  // user         User           @relation(fields: [userId], references: [id])
+  // categories   Category[]
+  // availability Availability[]
+  // bookings     Booking[]
+
+  createdAt DateTime @default(now())
+  // reviews   Review[]
+}
+
+model Category {
+  id   Int    @id @default(autoincrement())
+  name String @unique
+
+  // tutors TutorProfile[]
+}
+
+model Availability {
+  id        Int      @id @default(autoincrement())
+  tutorId   Int
+  date      DateTime
+  startTime String
+  endTime   String
+  isBooked  Boolean  @default(false)
+
+  // tutor TutorProfile @relation(fields: [tutorId], references: [id])
+}
+
+model Booking {
+  id        Int           @id @default(autoincrement())
+  studentId Int
+  tutorId   Int
+  status    BookingStatus @default(CONFIRMED)
+
+  // student User         @relation("StudentBookings", fields: [studentId], references: [id])
+  // tutor   TutorProfile @relation(fields: [tutorId], references: [id])
+
+  createdAt DateTime @default(now())
+}
+
+model Review {
+  id      Int    @id @default(autoincrement())
+  rating  Int
+  comment String
+
+  studentId Int
+  tutorId   Int
+
+  // student User         @relation(fields: [studentId], references: [id])
+  // tutor   TutorProfile @relation(fields: [tutorId], references: [id])
+
+  createdAt DateTime @default(now())
+}
+
+model User {
+  id            String    @id
+  name          String
+  email         String
+  emailVerified Boolean   @default(false)
+  image         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  sessions      Session[]
+  accounts      Account[]
+
+  @@unique([email])
+  @@map("user")
+}
+
+model Session {
+  id        String   @id
+  expiresAt DateTime
+  token     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  ipAddress String?
+  userAgent String?
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([token])
+  @@index([userId])
+  @@map("session")
+}
+
+model Account {
+  id                    String    @id
+  accountId             String
+  providerId            String
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  @@index([userId])
+  @@map("account")
+}
+
+model Verification {
+  id         String   @id
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([identifier])
+  @@map("verification")
+}
