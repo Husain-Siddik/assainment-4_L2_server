@@ -30,42 +30,53 @@ enum BookingStatus {
   CANCELLED
 }
 
-// model User {
-//   id       Int        @id @default(autoincrement())
-//   name     String
-//   email    String     @unique
-//   password String
-//   role     Role
-//   status   UserStatus @default(ACTIVE)
+model User {
+  id    String @id
+  name  String
+  email String @unique
 
-//   // tutorProfile TutorProfile?
-//   // bookings     Booking[]     @relation("StudentBookings")
-//   // reviews      Review[]
+  role   Role
+  status UserStatus @default(ACTIVE)
 
-//   createdAt DateTime @default(now())
-// }
+  tutorProfile TutorProfile?
+
+  emailVerified Boolean  @default(false)
+  image         String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  sessions Session[]
+  accounts Account[]
+
+  bookings Booking[]
+  reviews  Review[]
+
+  @@index([email])
+  @@map("user")
+}
 
 model TutorProfile {
   id         Int    @id @default(autoincrement())
-  userId     Int    @unique
+  userId     String @unique
   bio        String
   pricePerHr Float
   rating     Float  @default(0)
 
-  // user         User           @relation(fields: [userId], references: [id])
-  // categories   Category[]
-  // availability Availability[]
-  // bookings     Booking[]
+  user User @relation(fields: [userId], references: [id])
 
-  createdAt DateTime @default(now())
-  // reviews   Review[]
+  categories   Category[]
+  availability Availability[]
+
+  createdAt DateTime  @default(now())
+  bookings  Booking[]
+  reviews   Review[]
 }
 
 model Category {
   id   Int    @id @default(autoincrement())
   name String @unique
 
-  // tutors TutorProfile[]
+  tutors TutorProfile[]
 }
 
 model Availability {
@@ -76,17 +87,18 @@ model Availability {
   endTime   String
   isBooked  Boolean  @default(false)
 
-  // tutor TutorProfile @relation(fields: [tutorId], references: [id])
+  tutor TutorProfile @relation(fields: [tutorId], references: [id])
 }
 
 model Booking {
-  id        Int           @id @default(autoincrement())
-  studentId Int
-  tutorId   Int
-  status    BookingStatus @default(CONFIRMED)
+  id     Int           @id @default(autoincrement())
+  status BookingStatus @default(CONFIRMED)
 
-  // student User         @relation("StudentBookings", fields: [studentId], references: [id])
-  // tutor   TutorProfile @relation(fields: [tutorId], references: [id])
+  studentId String
+  tutorId   Int
+
+  student User         @relation(fields: [studentId], references: [id])
+  tutor   TutorProfile @relation(fields: [tutorId], references: [id])
 
   createdAt DateTime @default(now())
 }
@@ -96,28 +108,13 @@ model Review {
   rating  Int
   comment String
 
-  studentId Int
+  studentId String
   tutorId   Int
 
-  // student User         @relation(fields: [studentId], references: [id])
-  // tutor   TutorProfile @relation(fields: [tutorId], references: [id])
+  student User         @relation(fields: [studentId], references: [id])
+  tutor   TutorProfile @relation(fields: [tutorId], references: [id])
 
   createdAt DateTime @default(now())
-}
-
-model User {
-  id            String    @id
-  name          String
-  email         String
-  emailVerified Boolean   @default(false)
-  image         String?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  sessions      Session[]
-  accounts      Account[]
-
-  @@unique([email])
-  @@map("user")
 }
 
 model Session {
