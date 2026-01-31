@@ -1,20 +1,20 @@
 import { Request, Response, NextFunction } from "express";
-import { auth } from "../lib/auth"; 
+import { auth } from "../lib/auth";
 import { prisma } from "../lib/prisma";
 
 
 export async function isTutor(req: Request, res: Response, next: NextFunction) {
   try {
-   
+
     const session = await auth.api.getSession({
       headers: new Headers(Object.entries(req.headers as Record<string, string>)),
     });
 
     if (!session?.user) return next();
 
-   
+
     if (session.user.role === "TUTOR") {
-     
+
       const exists = await prisma.tutorProfile.findUnique({
         where: { userId: session.user.id },
       });
@@ -27,7 +27,7 @@ export async function isTutor(req: Request, res: Response, next: NextFunction) {
             pricePerHr: 0,
           },
         });
-        console.log("✅ TutorProfile created for", session.user.id);
+        console.log("TutorProfile created for", session.user.id);
       }
     }
 
