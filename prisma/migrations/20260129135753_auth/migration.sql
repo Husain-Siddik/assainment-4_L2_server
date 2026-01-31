@@ -12,7 +12,7 @@ CREATE TABLE "user" (
     "id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
     "email" TEXT NOT NULL,
-    "role" "Role" NOT NULL,
+    "role" "Role" NOT NULL DEFAULT 'STUDENT',
     "status" "UserStatus" NOT NULL DEFAULT 'ACTIVE',
     "emailVerified" BOOLEAN NOT NULL DEFAULT false,
     "image" TEXT,

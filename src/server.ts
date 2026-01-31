@@ -13,7 +13,7 @@ async function main() {
             console.log(`Server is running on   http://localhost:${PORT}`);
         });
     } catch (error) {
-        console.error("A j error occurred:", error);
+        console.error("An error occurred:", error);
         await prisma.$disconnect();
         process.exit(1);
     }

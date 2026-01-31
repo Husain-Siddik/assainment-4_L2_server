@@ -35,7 +35,7 @@ model User {
   name  String
   email String @unique
 
-  role   Role
+  role   Role       @default(STUDENT)
   status UserStatus @default(ACTIVE)
 
   tutorProfile TutorProfile?
@@ -62,7 +62,7 @@ model TutorProfile {
   pricePerHr Float
   rating     Float  @default(0)
 
-  user User @relation(fields: [userId], references: [id])
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   categories   Category[]
   availability Availability[]
@@ -87,7 +87,7 @@ model Availability {
   endTime   String
   isBooked  Boolean  @default(false)
 
-  tutor TutorProfile @relation(fields: [tutorId], references: [id])
+  tutor TutorProfile @relation(fields: [tutorId], references: [id], onDelete: Cascade)
 }
 
 model Booking {
@@ -97,8 +97,8 @@ model Booking {
   studentId String
   tutorId   Int
 
-  student User         @relation(fields: [studentId], references: [id])
-  tutor   TutorProfile @relation(fields: [tutorId], references: [id])
+  student User         @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  tutor   TutorProfile @relation(fields: [tutorId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
 }
@@ -111,8 +111,8 @@ model Review {
   studentId String
   tutorId   Int
 
-  student User         @relation(fields: [studentId], references: [id])
-  tutor   TutorProfile @relation(fields: [tutorId], references: [id])
+  student User         @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  tutor   TutorProfile @relation(fields: [tutorId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
 }
