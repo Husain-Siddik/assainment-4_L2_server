@@ -8,6 +8,8 @@ import cors from "cors"
 import authorizeRoles, { UserRole } from "./middlewares/authorizeRoles";
 import { tutorRouter } from "./modules/tutor/tutor.router";
 import { categoryRouter } from "./modules/category/category.router";
+import { userRouter } from "./modules/user/user.router";
+import { bookingRouter } from "./modules/booking/booking.router";
 
 
 
@@ -29,6 +31,9 @@ app.use(express.json())
 
 app.all("/api/auth/*splat", toNodeHandler(auth));
 
+//user
+app.use("/api/user", userRouter);
+
 
 // tutor 
 
@@ -40,13 +45,17 @@ app.use("/api/tutors", tutorRouter)
 app.use("/api/tutors-availability", availabilityRouter)
 
 
+//bookings
+app.use("/api/bookings", bookingRouter)
+
+
 // category 
 app.use("/api/category", categoryRouter)
 
 
 app.get('/',
   (req, res) => {
-    res.send('welcome ')
+    res.send('welcome  to server')
   })
 
 
