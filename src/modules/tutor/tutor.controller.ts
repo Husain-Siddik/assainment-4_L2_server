@@ -1,7 +1,10 @@
+
 import { Request, Response } from "express";
 
 import { UserRole } from "../../middlewares/authorizeRoles";
 import { TutorService } from "./tutor.service";
+import { success } from "better-auth/*";
+
 
 
 const createTutor = async (req: Request, res: Response) => {
@@ -130,11 +133,113 @@ const getTutorByUser = async (req: Request, res: Response) => {
 };
 
 
+const deleteTutorbyUserid = async (req: Request, res: Response) => {
+
+    try {
+
+        const userId = (req as any).user?.id;
+
+        if (!userId) {
+            throw new Error("User not found");
+        }
+
+        const tutor = await TutorService.getTutorByUserId(userId);
+
+        if (!tutor) {
+            throw new Error("Tutor profile not found for this user");
+        }
+
+        //  delete user and tutor 
+
+        if (tutor?.userId === userId) {
+            const result = await TutorService.deleteTutorWithUser(userId);
+
+            return res.status(200).json({
+                message: "Tutor profile deleted successfully",
+                result,
+            });
+        } else {
+            return res.status(500).json({
+                success: false,
+                message: "you are not authorized",
+
+            })
+        }
+
+
+
+
+
+    } catch (error) {
+        res.status(500).json({
+            error: "Failed to delete tutor",
+            details: error,
+        });
+
+    }
+}
+
+
+
+const updateTutor = async (req: Request, res: Response) => {
+
+    try {
+
+        const user = req?.user
+
+        const userId = user?.id
+
+
+        if (!userId) {
+            return res.status(401).json({
+                error: "Unauthorized not logged in",
+            });
+        }
+
+        const tutor = await TutorService.getTutorByUserId(userId);
+
+        if (!tutor) {
+            return res.status(404).json({
+                error: "There is no tutor profile for  this user ",
+            });
+        }
+
+        if (tutor.userId !== userId) {
+
+            return res.status(403).json({
+                error: "You are not authorized to update this tutor profile",
+
+            });
+        }
+
+        const updatedTutor = await TutorService.updateTutorProfile(userId, req.body);
+
+        res.status(200).json({
+            success: true,
+            message: "Tutor profile updated successfully",
+            data: updatedTutor
+        });
+
+
+
+
+    } catch (error: any) {
+        res.status(500).json({
+            error: "Failed to update profile  ",
+            details: error.message,
+        });
+    }
+}
+
+
+
 
 export const TutorController = {
     createTutor,
     getAllTutor,
     getTutorById,
     getTutorByUser,
+    deleteTutorbyUserid,
+    updateTutor
 
 };

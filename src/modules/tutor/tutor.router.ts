@@ -19,6 +19,18 @@ router.post(
 
 router.get("/byuser", authorizeRoles(UserRole.TUTOR), TutorController.getTutorByUser)
 
+router.patch(
+    "/byuser",
+    authorizeRoles(UserRole.TUTOR),
+    TutorController.updateTutor
+)
+
+router.delete(
+    "/byUserid",
+    authorizeRoles(UserRole.TUTOR, UserRole.ADMIN),
+    TutorController.deleteTutorbyUserid
+)
+
 // ---------- public routes --------------
 
 

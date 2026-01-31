@@ -69,6 +69,7 @@ const getTutorById = async (id: number) => {
 
 
 interface FilterOptions {
+
     categoryNames?: string[];
     minRating?: number | undefined;
 }
@@ -137,6 +138,30 @@ const getTutorByUserId = async (userId: string) => {
     });
 };
 
+const deleteTutorWithUser = async (userId: string,) => {
+
+    return await prisma.$transaction([
+
+        prisma.tutorProfile.delete({
+            where: { userId },
+        }),
+        //usr delete
+        prisma.user.delete({
+            where: { id: userId },
+        }),
+    ]);
+
+
+}
+
+const updateTutorProfile = async (userId: string, data: Partial<TutorProfile>) => {
+
+    return await prisma.tutorProfile.update({
+        where: { userId },
+        data,
+    });
+}
+
 
 
 
@@ -145,5 +170,7 @@ export const TutorService = {
     getTutorById,
     getAllTutor,
     getTutorByUserId,
+    deleteTutorWithUser,
+    updateTutorProfile,
 
 }
