@@ -1,8 +1,85 @@
+import { IntFieldRefInput, Result } from './../../../generated/prisma/internal/prismaNamespace';
 
 import { Request, Response } from "express";
 import { userService } from "./user.service";
 import { UserRole } from "../../middlewares/authorizeRoles";
+import { date, success } from "better-auth/*";
 
+
+
+
+// ----------------------only admin can-------------------------------------- 
+const getAllUser = async (req: Request, res: Response) => {
+
+    try {
+
+        const user = req?.user
+
+        if (!user) {
+            return res.status(401).json({
+                message: "Unauthorized  Login required"
+            })
+        }
+
+        if (user?.role !== UserRole.ADMIN) {
+            return res.status(403).json({
+                message: "Forbidden: Admin only"
+            })
+        }
+
+        const result = await userService.getAllUsersService()
+
+        res.status(200).json({
+            success: true,
+            message: "All user fatched succesfully ",
+            data: result
+        })
+
+
+
+
+
+    } catch (err) {
+        res.status(500).json({
+            succes: false,
+            message: "Faild to fatched all User ",
+            error: err
+        })
+
+    }
+
+}
+
+const updateStatusByAdmin = async (req: Request, res: Response) => {
+
+    try {
+        const id = req.params.id as string
+        const { status } = req.body
+        const user = req?.user
+
+        if (user?.role !== UserRole.ADMIN) {
+            res.status(403).json({
+                message: "unAuthorige to updete User Status"
+            })
+        }
+
+        const result = await userService.userStatusUpdateService(id, status)
+
+
+
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: "User status update faild ",
+            error: error
+        })
+    }
+}
+
+
+
+
+//-------------------------------------------------------------------------
 
 
 
@@ -99,12 +176,6 @@ const updateUser = async (req: Request, res: Response) => {
 
 
 
-        // for admin can update status 
-
-
-
-
-
     } catch (error: any) {
 
         res.status(500).json({
@@ -160,6 +231,7 @@ export const userController = {
     getuserbyid,
     updateUser,
     deleteProfile,
+    getAllUser
 
 };
 

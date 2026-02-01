@@ -1,6 +1,6 @@
 
 
-import { UserStatus } from "../../../generated/prisma/client";
+import { Prisma, UserStatus } from "../../../generated/prisma/client";
 import { prisma } from "../../lib/prisma";
 
 
@@ -41,6 +41,7 @@ const getuserbyIdService = async (userId: string) => {
             name: true,
             email: true,
             role: true,
+            status: true,
             createdAt: true,
         },
     });
@@ -81,7 +82,7 @@ const deleteProfileService = async (userId: string) => {
     });
 };
 
-
+// only admin can 
 const getAllUsersService = async () => {
 
     const users = await prisma.user.findMany({
@@ -99,12 +100,37 @@ const getAllUsersService = async () => {
 };
 
 
+// only admin can 
+
+const userStatusUpdateService = async (id: string, status: UserStatus) => {
+
+    try {
+
+        return await prisma.user.update({
+            where: { id },
+            data: { status },
+        });
+
+    } catch (error) {
+
+        if (error instanceof Prisma.PrismaClientKnownRequestError) {
+            if (error.code === "P2025") {
+                throw new Error("User not found");
+            }
+        }
+
+        throw error;
+    }
+
+}
+
 
 export const userService = {
     getCurentUserservice,
     getuserbyIdService,
     updateUserProfileService,
     deleteProfileService,
-    getAllUsersService
+    getAllUsersService,
+    userStatusUpdateService
 
 }

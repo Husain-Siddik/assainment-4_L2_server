@@ -1,3 +1,4 @@
+import { UserStatus } from './../../generated/prisma/enums';
 
 import { NextFunction, Request, Response } from "express";
 import { auth as betterAuth } from '../lib/auth'
@@ -44,6 +45,7 @@ const authorizeRoles = (...roles: UserRole[]) => {
                 email: session.user.email,
                 name: session.user.name,
                 role: session.user.role as string,
+
 
             }
 

@@ -14,7 +14,8 @@ router.get("/me", authorizeRoles(UserRole.ADMIN, UserRole.STUDENT), userControll
 router.patch("/me", authorizeRoles(UserRole.ADMIN, UserRole.STUDENT, UserRole.TUTOR), userController.updateUser);
 router.delete("/me", authorizeRoles(UserRole.ADMIN, UserRole.STUDENT, UserRole.TUTOR), userController.deleteProfile);
 
-
+//admin 
+router.get("/all", userController.getAllUser)
 
 //public
 router.get("/:id", userController.getuserbyid);
