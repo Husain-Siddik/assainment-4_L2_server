@@ -10,10 +10,15 @@ const router = express.Router();
 
 //public
 router.get("/bytutor/:tutorId", reviewController.getReviewsByTutorId)
+router.get("/:id", reviewController.getReviewByReviewid)
 
 
 // only student can 
 router.post("/", authorizeRoles(UserRole.STUDENT), reviewController.createReview)
+router.put('/update', authorizeRoles(UserRole.STUDENT), reviewController.updateReview)
+
+// only admin can 
+router.get('/all', authorizeRoles(UserRole.ADMIN), reviewController.getAllReviews)
 
 
 

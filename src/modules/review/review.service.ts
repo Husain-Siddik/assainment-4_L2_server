@@ -80,11 +80,71 @@ const getReviewByReviewIdService = async (id: number) => {
 }
 
 
+const getAllReviewsService = async () => {
+
+    return await prisma.review.findMany({
+
+        include: {
+            student: {
+                select: {
+                    id: true,
+                    name: true,
+                    email: true,
+
+                }
+            },
+            tutor: {
+                select: {
+                    id: true,
+                    bio: true,
+                    pricePerHr: true,
+                    userId: true
+                }
+            }
+        }
+
+    })
+
+}
+
+
+const updateReviewService = async (
+    studentId: string,
+    tutorId: number,
+    rating: number,
+    comment: string
+) => {
+    return await prisma.review.update({
+        where: {
+            studentId_tutorId: { studentId, tutorId }
+        },
+        data: { rating, comment }
+    });
+}
+
+
+const deleteReviewService = async (
+    studentId: string,
+    tutorId: number
+) => {
+    return await prisma.review.delete({
+
+        where: {
+            studentId_tutorId: { studentId, tutorId }
+        }
+    });
+}
+
+
+
 
 
 export const reviewService = {
     createReviewService,
     getReviewsByTutorIdService,
-    getReviewByReviewIdService
+    getReviewByReviewIdService,
+    getAllReviewsService,
+    updateReviewService,
+    deleteReviewService
 
 }
