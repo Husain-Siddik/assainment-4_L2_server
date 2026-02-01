@@ -13,7 +13,12 @@ router.get(
     categoryController.getAllCetogories
 )
 
+// private 
 
+router.post("/", categoryController.createCategory)
+router.get("/:id", categoryController.getCategoryById)
+router.put("/:id", categoryController.updateCategory)
+router.delete("/:id", categoryController.deleteCategory)
 
 
 

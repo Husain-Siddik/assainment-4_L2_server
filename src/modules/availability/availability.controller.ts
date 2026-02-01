@@ -40,7 +40,10 @@ const createAvailability = async (req: Request, res: Response) => {
     try {
 
         if (!date || !startTime || !endTime) {
-            return res.status(400).json({ success: false, message: "All fields are required" });
+            return res.status(400).json({
+                success: false,
+                message: "date, startTime, endTime fields are required"
+            });
         }
 
         if (startTime >= endTime) {

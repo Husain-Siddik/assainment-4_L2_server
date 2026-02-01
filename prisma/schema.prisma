@@ -115,6 +115,8 @@ model Review {
   tutor   TutorProfile @relation(fields: [tutorId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
+
+  @@unique([studentId, tutorId])
 }
 
 model Session {

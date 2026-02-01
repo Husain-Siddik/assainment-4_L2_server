@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 
 import { UserRole } from "../../middlewares/authorizeRoles";
 import { bookingService } from "./booking.service";
-import { success } from "better-auth/*";
+
 import { TutorService } from "../tutor/tutor.service";
 import { BookingStatus } from "../../../generated/prisma/enums";
 

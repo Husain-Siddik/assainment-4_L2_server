@@ -10,6 +10,7 @@ import { tutorRouter } from "./modules/tutor/tutor.router";
 import { categoryRouter } from "./modules/category/category.router";
 import { userRouter } from "./modules/user/user.router";
 import { bookingRouter } from "./modules/booking/booking.router";
+import { reviewRouter } from "./modules/review/review.router";
 
 
 
@@ -48,8 +49,12 @@ app.use("/api/tutors-availability", availabilityRouter)
 //bookings
 app.use("/api/bookings", bookingRouter)
 
+// review
 
-// category 
+app.use("/api/review", reviewRouter)
+
+
+// category that admin can handel 
 app.use("/api/category", categoryRouter)
 
 

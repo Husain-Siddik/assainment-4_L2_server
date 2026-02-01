@@ -1,5 +1,4 @@
-import { User } from './../../../generated/prisma/client';
-import { TutorProfile } from "../../../generated/prisma/client";
+import { Category, User } from './../../../generated/prisma/client';
 import { prisma } from "../../lib/prisma";
 import { UserRole } from "../../middlewares/authorizeRoles";
 
@@ -10,7 +9,7 @@ const getAllCategory = async () => {
     const categories = await prisma.category.findMany({
 
         orderBy: {
-            name: "asc"
+            name: "desc"
         },
         include: {
             tutors: {
@@ -35,10 +34,67 @@ const getAllCategory = async () => {
 };
 
 
+const getCetegoryByIdService = async (id: number) => {
+
+    return await prisma.category.findUnique({
+        where: {
+            id
+        }
+    })
+
+
+}
+
+
+const createCategoryService = async (name: string) => {
+
+    return await prisma.category.create({
+        data: {
+            name: name,
+        }
+    })
+
+
+}
+
+const updateCategoryService = async (id: number, name: string) => {
+
+    return await prisma.category.update({
+        where: {
+            id
+        },
+        data: {
+            name
+        }
+
+    })
+
+}
+
+const deleteCategoryService = async (id: number) => {
+
+    return await prisma.category.delete({
+
+        where: {
+
+            id
+        }
+
+    })
+
+}
+
+
+
+
 
 
 export const categoryService = {
 
+    createCategoryService,
     getAllCategory,
+    getCetegoryByIdService,
+    updateCategoryService,
+    deleteCategoryService
 
 }
