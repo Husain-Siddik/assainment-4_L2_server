@@ -82,7 +82,7 @@ const deleteProfileService = async (userId: string) => {
     });
 };
 
-// only admin can 
+//---------------------- only admin can-------------------- 
 const getAllUsersService = async () => {
 
     const users = await prisma.user.findMany({
@@ -100,7 +100,7 @@ const getAllUsersService = async () => {
 };
 
 
-// only admin can 
+//--------------- only admin can ------------------
 
 const userStatusUpdateService = async (id: string, status: UserStatus) => {
 
@@ -114,6 +114,7 @@ const userStatusUpdateService = async (id: string, status: UserStatus) => {
     } catch (error) {
 
         if (error instanceof Prisma.PrismaClientKnownRequestError) {
+
             if (error.code === "P2025") {
                 throw new Error("User not found");
             }
@@ -124,6 +125,18 @@ const userStatusUpdateService = async (id: string, status: UserStatus) => {
 
 }
 
+//--------------- only admin can ------------------
+
+const userSesionDeleteAfterbanned = async (userId: string) => {
+
+    await prisma.session.deleteMany({
+        where: {
+            userId: userId,
+        },
+    });
+
+}
+
 
 export const userService = {
     getCurentUserservice,
@@ -131,6 +144,7 @@ export const userService = {
     updateUserProfileService,
     deleteProfileService,
     getAllUsersService,
-    userStatusUpdateService
+    userStatusUpdateService,
+    userSesionDeleteAfterbanned
 
 }

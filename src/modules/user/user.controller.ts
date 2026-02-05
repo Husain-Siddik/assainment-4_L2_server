@@ -1,9 +1,10 @@
-import { IntFieldRefInput, Result } from './../../../generated/prisma/internal/prismaNamespace';
+
 
 import { Request, Response } from "express";
 import { userService } from "./user.service";
 import { UserRole } from "../../middlewares/authorizeRoles";
-import { date, success } from "better-auth/*";
+
+import { UserStatus } from '../../../generated/prisma/enums';
 
 
 
@@ -54,16 +55,54 @@ const updateStatusByAdmin = async (req: Request, res: Response) => {
 
     try {
         const id = req.params.id as string
-        const { status } = req.body
+        const status = req.body.status as UserStatus
         const user = req?.user
 
         if (user?.role !== UserRole.ADMIN) {
-            res.status(403).json({
+            return res.status(403).json({
                 message: "unAuthorige to updete User Status"
             })
         }
 
+
+        if (status !== UserStatus.ACTIVE && status !== UserStatus.BANNED) {
+
+            return res.status(400).json({
+                success: false,
+                message: "Status must be ACTIVE or BANNED"
+
+            })
+
+        }
+
+
         const result = await userService.userStatusUpdateService(id, status)
+
+
+        if (!result) {
+            return res.status(404).json({
+                success: false,
+                message: "User not found",
+            });
+        }
+
+
+        // sesion delete 
+
+        if (status === UserStatus.BANNED) {
+            await userService.userSesionDeleteAfterbanned(result.id);
+
+        }
+
+        //after banning a user delete session 
+        return res.status(200).json({
+            success: true,
+            message:
+                status === UserStatus.BANNED
+                    ? "User banned and all sessions invalidated"
+                    : "User activated successfully",
+            data: result,
+        });
 
 
 
@@ -231,7 +270,8 @@ export const userController = {
     getuserbyid,
     updateUser,
     deleteProfile,
-    getAllUser
+    getAllUser,
+    updateStatusByAdmin
 
 };
 
