@@ -163,6 +163,31 @@ const updateTutorProfile = async (userId: string, data: Partial<TutorProfile>) =
 }
 
 
+//-----------------Category (Subject Related )-----------------------
+
+const categorysetForTutorService = async (
+    tutorId: number,
+    categoryIds: number[]
+
+) => {
+
+    return await prisma.tutorProfile.update({
+        where: {
+            id: tutorId
+        },
+        data: {
+            categories: {
+                set: categoryIds.map((id) => ({ id }))
+            }
+        },
+        include: {
+            categories: true
+        }
+    })
+
+
+}
+
 
 
 export const TutorService = {
@@ -172,5 +197,9 @@ export const TutorService = {
     getTutorByUserId,
     deleteTutorWithUser,
     updateTutorProfile,
+
+    // ------
+
+    categorysetForTutorService,
 
 }

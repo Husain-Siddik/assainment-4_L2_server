@@ -3,6 +3,7 @@ import { Request, Response } from "express";
 
 import { UserRole } from "../../middlewares/authorizeRoles";
 import { TutorService } from "./tutor.service";
+import { success } from "better-auth/*";
 
 
 
@@ -231,6 +232,62 @@ const updateTutor = async (req: Request, res: Response) => {
     }
 }
 
+//------------------tutor and Category ------------------------
+
+const setCategoryForTutor = async (req: Request, res: Response) => {
+
+    try {
+
+        const { categoryIds } = req.body;
+        const user = req.user
+
+
+        if (user?.role !== UserRole.TUTOR) {
+            return res.status(403).json({
+                success: false,
+                message: " Only tutor can set Cetegory For Himslef/Herself"
+            })
+
+        }
+
+        if (!Array.isArray(categoryIds) || categoryIds.length === 0) {
+            return res.status(400).json({
+                success: false,
+                message: "categoryIds must be an array",
+            });
+        }
+
+        const tutor = await TutorService.getTutorByUserId(user.id)
+
+        if (!tutor) {
+            return res.status(404).json({
+                success: false,
+                message: "No tutor profile  Found !!! "
+            })
+
+        }
+
+        const result = await TutorService.categorysetForTutorService(tutor.id, categoryIds)
+
+        res.status(201).json({
+            success: true,
+            message: "Cetegory Added Succesfully",
+            data: result
+        })
+
+
+
+
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: "Faild to set Cetegory for Tutor profile",
+            error: error
+        })
+
+    }
+
+}
 
 
 
@@ -240,6 +297,9 @@ export const TutorController = {
     getTutorById,
     getTutorByUser,
     deleteTutorbyUserid,
-    updateTutor
+    updateTutor,
+
+    //------
+    setCategoryForTutor
 
 };
