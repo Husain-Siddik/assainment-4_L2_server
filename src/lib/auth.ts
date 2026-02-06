@@ -8,28 +8,29 @@ import { prisma } from "./prisma";
 
 export const auth = betterAuth({
 
-    database: prismaAdapter(prisma, {
-        provider: "postgresql", // or "mysql", "postgresql", ...etc
-    }),
+  database: prismaAdapter(prisma, {
+    provider: "postgresql", // or "mysql", "postgresql", ...etc
+  }),
 
-    trustedOrigins :[process.env.APP_URL || "http://localhost:3000"],
+  trustedOrigins: [process.env.APP_URL || "http://localhost:3000"],
 
-    user :{
-      additionalFields:{
- 
-      role:{
+  user: {
+    additionalFields: {
+
+      role: {
         type: "string",
-        defaultValue :"STUDENT",
-        required: true      }
+        defaultValue: "STUDENT",
+        required: true
       }
-    },
-    
-   
-    emailAndPassword: { 
-    enabled: true,
-    autoSignIn:false 
+    }
   },
 
-  
+
+  emailAndPassword: {
+    enabled: true,
+    autoSignIn: true
+  },
+
+
 
 });
