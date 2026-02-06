@@ -1,9 +1,11 @@
+import { Result } from './../../../generated/prisma/internal/prismaNamespace';
 
 import { Request, Response } from "express";
 
 import { UserRole } from "../../middlewares/authorizeRoles";
 import { TutorService } from "./tutor.service";
 import { success } from "better-auth/*";
+import { categoryService } from "../category/category.service";
 
 
 
@@ -238,7 +240,7 @@ const setCategoryForTutor = async (req: Request, res: Response) => {
 
     try {
 
-        const { categoryIds } = req.body;
+        let { categoryIds } = req.body;
         const user = req.user
 
 
@@ -257,6 +259,7 @@ const setCategoryForTutor = async (req: Request, res: Response) => {
             });
         }
 
+
         const tutor = await TutorService.getTutorByUserId(user.id)
 
         if (!tutor) {
@@ -266,6 +269,29 @@ const setCategoryForTutor = async (req: Request, res: Response) => {
             })
 
         }
+
+        //category id validation befor set 
+
+        const validCategorys = await categoryService.validCategoryesService(categoryIds)
+
+
+        const validIds = validCategorys.map(c => c.id)
+
+        const invalidIds = categoryIds.filter(
+            (id: number) => !validIds.includes(id)
+        );
+
+
+        if (invalidIds.length > 0) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid category IDs provided ",
+                invalidCategoryIds: invalidIds,
+            });
+        }
+
+
+
 
         const result = await TutorService.categorysetForTutorService(tutor.id, categoryIds)
 
@@ -290,6 +316,174 @@ const setCategoryForTutor = async (req: Request, res: Response) => {
 }
 
 
+const removeCategoryForTutor = async (req: Request, res: Response) => {
+
+
+    try {
+        const { categoryIds } = req.body;
+        const user = req.user;
+
+        if (user?.role !== UserRole.TUTOR) {
+            return res.status(403).json({
+                success: false,
+                message: "Only tutor can remove categories",
+            });
+        }
+
+        if (!Array.isArray(categoryIds) || categoryIds.length === 0) {
+            return res.status(400).json({
+                success: false,
+                message: "categoryIds must be a non-empty array",
+            });
+        }
+
+        const tutor = await TutorService.getTutorByUserId(user.id);
+        if (!tutor) {
+            return res.status(404).json({
+                success: false,
+                message: "Tutor profile not found",
+            });
+        }
+
+        const result = await TutorService.removeCategoryService(
+            tutor.id,
+            categoryIds
+        );
+
+        return res.status(200).json({
+            success: true,
+            message: "Categories removed successfully",
+            data: result,
+        });
+
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            message: "Failed to remove categories",
+            error,
+        });
+    }
+
+}
+
+
+const addSingelTutorCategory = async (req: Request, res: Response) => {
+
+    try {
+
+        const { categoryIds } = req.body;
+        const user = req.user
+
+
+        if (user?.role !== UserRole.TUTOR) {
+            return res.status(403).json({
+                success: false,
+                message: " Only tutor can set Cetegory For Himslef/Herself"
+            })
+
+        }
+
+        if (!Array.isArray(categoryIds) || categoryIds.length === 0) {
+            return res.status(400).json({
+                success: false,
+                message: "categoryIds must be an array",
+            });
+        }
+
+
+        const tutor = await TutorService.getTutorByUserId(user.id)
+
+        if (!tutor) {
+            return res.status(404).json({
+                success: false,
+                message: "No tutor profile  Found !!! "
+            })
+
+        }
+
+
+        const validCategorys = await categoryService.validCategoryesService(categoryIds)
+
+
+        const validIds = validCategorys.map(c => c.id)
+
+        const invalidIds = categoryIds.filter(
+            (id: number) => !validIds.includes(id)
+        );
+
+
+        if (invalidIds.length > 0) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid category IDs provided ",
+                invalidCategoryIds: invalidIds,
+            });
+        }
+
+        const result = await TutorService.addSingelCategoryService(tutor.id, categoryIds)
+
+
+        res.status(201).json({
+            success: true,
+            message: "Added singel Category",
+            data: result
+        })
+
+
+
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: "Adding category Faild ",
+            error: error
+        })
+
+    }
+}
+
+
+const deleteAllCategoryForTutor = async (req: Request, res: Response) => {
+
+    try {
+
+        const user = req.user;
+
+        if (user?.role !== UserRole.TUTOR) {
+            return res.status(403).json({
+                success: false,
+                message: "Only tutor can remove categories",
+            });
+        }
+
+
+        const tutor = await TutorService.getTutorByUserId(user.id);
+        if (!tutor) {
+            return res.status(404).json({
+                success: false,
+                message: "Tutor profile not found",
+            });
+        }
+
+        const result = await TutorService.deleteAllCategoryService(tutor.id)
+
+        res.status(200).json({
+            success: true,
+            message: "all Category Deleted Succesfully ",
+            data: result
+        })
+
+
+
+
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: "Faild to delete All Category "
+        })
+    }
+}
+
+
 
 export const TutorController = {
     createTutor,
@@ -299,7 +493,10 @@ export const TutorController = {
     deleteTutorbyUserid,
     updateTutor,
 
-    //------
-    setCategoryForTutor
+    //------Category ----
+    setCategoryForTutor,
+    removeCategoryForTutor,
+    addSingelTutorCategory,
+    deleteAllCategoryForTutor
 
 };

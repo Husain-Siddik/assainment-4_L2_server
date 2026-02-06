@@ -31,6 +31,17 @@ router.delete(
     TutorController.deleteTutorbyUserid
 )
 
+// Cetegory related 
+
+router.post("/add-category", authorizeRoles(UserRole.TUTOR), TutorController.setCategoryForTutor)
+router.delete("/delete-category", authorizeRoles(UserRole.TUTOR), TutorController.removeCategoryForTutor)
+
+router.post("/add-singelCategory", authorizeRoles(UserRole.TUTOR), TutorController.addSingelTutorCategory)
+router.delete("/delete-all_category", authorizeRoles(UserRole.TUTOR), TutorController.deleteAllCategoryForTutor)
+
+
+
+
 // ---------- public routes --------------
 
 

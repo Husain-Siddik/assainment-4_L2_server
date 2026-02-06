@@ -82,6 +82,11 @@ const deleteProfileService = async (userId: string) => {
     });
 };
 
+
+
+
+
+
 //---------------------- only admin can-------------------- 
 const getAllUsersService = async () => {
 
@@ -145,6 +150,10 @@ export const userService = {
     deleteProfileService,
     getAllUsersService,
     userStatusUpdateService,
-    userSesionDeleteAfterbanned
+    userSesionDeleteAfterbanned,
+
+
+    ///
+
 
 }

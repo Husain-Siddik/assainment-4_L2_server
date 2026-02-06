@@ -1,5 +1,6 @@
 // import { CommentStatus, Post, PostStatus } from "../../../generated/prisma/client";
 // import { PostWhereInput } from "../../../generated/prisma/models";
+import { symbol } from "better-auth/*";
 import { TutorProfile } from "../../../generated/prisma/client";
 import { prisma } from "../../lib/prisma";
 import { UserRole } from "../../middlewares/authorizeRoles";
@@ -171,6 +172,7 @@ const categorysetForTutorService = async (
 
 ) => {
 
+
     return await prisma.tutorProfile.update({
         where: {
             id: tutorId
@@ -190,6 +192,69 @@ const categorysetForTutorService = async (
 
 
 
+const removeCategoryService = async (
+
+    tutorId: number,
+    categoryIds: number[]
+) => {
+
+    return prisma.tutorProfile.update({
+        where: { id: tutorId },
+        data: {
+            categories: {
+                disconnect: categoryIds.map(id => ({ id })),
+            },
+        },
+        include: {
+            categories: true,
+        },
+    });
+}
+
+
+const addSingelCategoryService = async (
+    tutorId: number,
+    categoryIds: number[]
+
+) => {
+
+
+    return await prisma.tutorProfile.update({
+        where: {
+            id: tutorId
+        },
+        data: {
+            categories: {
+                connect: categoryIds.map((id) => ({ id }))
+            }
+        },
+        include: {
+            categories: true
+        }
+    })
+
+
+}
+
+
+const deleteAllCategoryService = async (tutorId: number) => {
+
+    return await prisma.tutorProfile.update({
+        where: { id: tutorId },
+        data: {
+            categories: {
+                set: [],
+            },
+        },
+        include: {
+            categories: true,
+        },
+    })
+
+
+}
+
+
 export const TutorService = {
     createTutor,
     getTutorById,
@@ -201,5 +266,8 @@ export const TutorService = {
     // ------
 
     categorysetForTutorService,
+    removeCategoryService,
+    addSingelCategoryService,
+    deleteAllCategoryService
 
 }

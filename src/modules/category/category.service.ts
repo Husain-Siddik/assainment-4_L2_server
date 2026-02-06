@@ -85,7 +85,24 @@ const deleteCategoryService = async (id: number) => {
 }
 
 
+//
 
+//  tutor use 
+
+
+const validCategoryesService = async (categoryIds: number[]) => {
+
+    return await prisma.category.findMany({
+        where: {
+            id: { in: categoryIds },
+        },
+        select: {
+            id: true
+        }
+    })
+
+
+}
 
 
 
@@ -95,6 +112,9 @@ export const categoryService = {
     getAllCategory,
     getCetegoryByIdService,
     updateCategoryService,
-    deleteCategoryService
+    deleteCategoryService,
+
+
+    validCategoryesService
 
 }
