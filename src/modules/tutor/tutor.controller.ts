@@ -4,8 +4,9 @@ import { Request, Response } from "express";
 
 import { UserRole } from "../../middlewares/authorizeRoles";
 import { TutorService } from "./tutor.service";
-import { success } from "better-auth/*";
+
 import { categoryService } from "../category/category.service";
+import { success } from 'better-auth';
 
 
 
@@ -18,8 +19,8 @@ const createTutor = async (req: Request, res: Response) => {
 
         if (!user) {
             return res.status(400).json({
-
-                error: "Unauthorized!",
+                success: false,
+                message: "Unauthorized!",
             });
         }
 
@@ -27,7 +28,8 @@ const createTutor = async (req: Request, res: Response) => {
 
             return res.status(400).json({
 
-                error: "Unauthorized!",
+                success: false,
+                message: "Unauthorized!",
             });
 
         }
@@ -40,10 +42,15 @@ const createTutor = async (req: Request, res: Response) => {
 
         );
 
-        res.status(201).json(result);
+        res.status(201).json({
+            success: true,
+            message: "Tutor Profile Created Succesfully ",
+            data: result
+        });
 
     } catch (e) {
         res.status(400).json({
+            success: false,
             error: "Tutor Profile creation failed",
             details: e
         })
@@ -56,16 +63,26 @@ const getTutorById = async (req: Request, res: Response) => {
         const tutorId = req.params.id
 
         if (!tutorId) {
-            throw new Error("Tutor id  is required!");
+            return res.status(400).json({
+                success: false,
+                message: "tutor Id Unavailable "
+            })
         }
 
         const result = await TutorService.getTutorById(Number(tutorId));
 
         if (!result) {
-            throw new Error("Tutor not found!");
+            return res.status(400).json({
+                success: false,
+                message: "Tutor  unavailable"
+            })
         }
 
-        res.status(200).json(result);
+        res.status(200).json({
+            success: true,
+            message: "Tutor Fatched Succesfully",
+            data: result
+        });
     } catch (e: any) {
         res.status(400).json({
             error: "Could not find any tutor",
@@ -92,7 +109,11 @@ const getAllTutor = async (req: Request, res: Response) => {
             minRating: minRating ? Number(minRating) : undefined,
         });
 
-        res.status(200).json(result);
+        res.status(200).json({
+            success: true,
+            message: "All Tutor Fatched Succesfully",
+            data: result
+        });
 
     } catch (e: any) {
         res.status(400).json({
@@ -114,7 +135,8 @@ const getTutorByUser = async (req: Request, res: Response) => {
         if (!userId) {
 
             return res.status(401).json({
-                error: "Unauthorized: user not logged in",
+                success: false,
+                message: "Unauthorized: user not logged in",
             });
         }
 
@@ -122,11 +144,16 @@ const getTutorByUser = async (req: Request, res: Response) => {
 
         if (!tutor) {
             return res.status(404).json({
-                error: "Tutor profile not found for this user",
+                success: false,
+                mesage: "Tutor profile not found for this user",
             });
         }
 
-        res.status(200).json(tutor);
+        res.status(200).json({
+            success: true,
+            message: "tutor profile Fetch Succesfully ",
+            data: tutor
+        });
     } catch (error: any) {
         res.status(500).json({
             error: "Failed to get tutor",
@@ -143,13 +170,18 @@ const deleteTutorbyUserid = async (req: Request, res: Response) => {
         const userId = (req as any).user?.id;
 
         if (!userId) {
-            throw new Error("User not found");
-        }
+            return res.status(400).json({
 
+                message: "User not found"
+            })
+
+        }
         const tutor = await TutorService.getTutorByUserId(userId);
 
         if (!tutor) {
-            throw new Error("Tutor profile not found for this user");
+            return res.status(400).json({
+                message: "Tutor profile not found for this user"
+            })
         }
 
         //  delete user and tutor 
@@ -159,7 +191,7 @@ const deleteTutorbyUserid = async (req: Request, res: Response) => {
 
             return res.status(200).json({
                 message: "Tutor profile deleted successfully",
-                result,
+                data: result
             });
         } else {
             return res.status(500).json({
@@ -175,6 +207,7 @@ const deleteTutorbyUserid = async (req: Request, res: Response) => {
 
     } catch (error) {
         res.status(500).json({
+            success: false,
             error: "Failed to delete tutor",
             details: error,
         });
@@ -195,7 +228,8 @@ const updateTutor = async (req: Request, res: Response) => {
 
         if (!userId) {
             return res.status(401).json({
-                error: "Unauthorized not logged in",
+                success: false,
+                message: "Unauthorized not logged in",
             });
         }
 
@@ -203,14 +237,16 @@ const updateTutor = async (req: Request, res: Response) => {
 
         if (!tutor) {
             return res.status(404).json({
-                error: "There is no tutor profile for  this user ",
+                success: false,
+                message: "There is no tutor profile for  this user ",
             });
         }
 
         if (tutor.userId !== userId) {
 
             return res.status(403).json({
-                error: "You are not authorized to update this tutor profile",
+                success: false,
+                message: "You are not authorized to update this tutor profile",
 
             });
         }
@@ -228,6 +264,7 @@ const updateTutor = async (req: Request, res: Response) => {
 
     } catch (error: any) {
         res.status(500).json({
+            success: false,
             error: "Failed to update profile  ",
             details: error.message,
         });

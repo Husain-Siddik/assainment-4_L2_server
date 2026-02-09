@@ -25,7 +25,10 @@ const getALLAvailability = async (req: Request, res: Response) => {
 
     } catch (err) {
 
-        res.status(500).json({ success: false, message: "Failed to fetch availability" });
+        res.status(500).json({
+            success: false,
+            message: "Failed to fetch availability"
+        });
     }
 
 

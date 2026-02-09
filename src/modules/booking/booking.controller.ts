@@ -20,8 +20,8 @@ const createBooking = async (req: Request, res: Response) => {
 
         if (!user) {
             return res.status(400).json({
-
-                error: "Unauthorized  login required  !! ",
+                success: false,
+                message: "Unauthorized  login required  !! ",
 
             });
         }
@@ -29,8 +29,8 @@ const createBooking = async (req: Request, res: Response) => {
         if (user.role !== UserRole.STUDENT) {
 
             return res.status(400).json({
-
-                error: "Unauthorized  Only student can book  a tutor  !!",
+                success: false,
+                message: "Unauthorized  Only student can book  a tutor  !!",
             });
 
         }
@@ -172,7 +172,8 @@ const getBookingByUserId = async (req: Request, res: Response) => {
         if (!user) {
 
             return res.status(400).json({
-                error: " Unauthorized  login required  !! ",
+                success: false,
+                message: " Unauthorized  login required  !! ",
 
             });
         }
@@ -208,7 +209,7 @@ const getAllBooking = async (req: Request, res: Response) => {
 
             return res.status(400).json({
                 success: false,
-                error: " Unauthorized  you are not an admin   !! ",
+                message: " Unauthorized  you are not an admin   !! ",
 
             });
         }
@@ -256,12 +257,16 @@ const getBookingById = async (req: Request, res: Response) => {
 
 
         if (!booking) {
-            return res.status(404).json({ error: "Booking not found" });
+            return res.status(404).json({
+                success: false,
+                message: "Booking not found"
+            });
         }
 
         if (booking.studentId !== user?.id) {
             return res.status(403).json({
-                error: "You are not allowed to view this booking",
+                success: false,
+                message: "You are not allowed to view this booking",
             });
         }
 

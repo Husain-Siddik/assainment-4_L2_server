@@ -577,7 +577,10 @@ var getALLAvailability = async (req, res) => {
       }
     );
   } catch (err) {
-    res.status(500).json({ success: false, message: "Failed to fetch availability" });
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch availability"
+    });
   }
 };
 var createAvailability2 = async (req, res) => {
@@ -801,12 +804,14 @@ var createTutor2 = async (req, res) => {
     const user = req.user;
     if (!user) {
       return res.status(400).json({
-        error: "Unauthorized!"
+        success: false,
+        message: "Unauthorized!"
       });
     }
     if (user.role !== "TUTOR" /* TUTOR */) {
       return res.status(400).json({
-        error: "Unauthorized!"
+        success: false,
+        message: "Unauthorized!"
       });
     }
     const result = await TutorService.createTutor(
@@ -814,9 +819,14 @@ var createTutor2 = async (req, res) => {
       user.id,
       user.role
     );
-    res.status(201).json(result);
+    res.status(201).json({
+      success: true,
+      message: "Tutor Profile Created Succesfully ",
+      data: result
+    });
   } catch (e) {
     res.status(400).json({
+      success: false,
       error: "Tutor Profile creation failed",
       details: e
     });
@@ -826,13 +836,23 @@ var getTutorById2 = async (req, res) => {
   try {
     const tutorId = req.params.id;
     if (!tutorId) {
-      throw new Error("Tutor id  is required!");
+      return res.status(400).json({
+        success: false,
+        message: "tutor Id Unavailable "
+      });
     }
     const result = await TutorService.getTutorById(Number(tutorId));
     if (!result) {
-      throw new Error("Tutor not found!");
+      return res.status(400).json({
+        success: false,
+        message: "Tutor  unavailable"
+      });
     }
-    res.status(200).json(result);
+    res.status(200).json({
+      success: true,
+      message: "Tutor Fatched Succesfully",
+      data: result
+    });
   } catch (e) {
     res.status(400).json({
       error: "Could not find any tutor",
@@ -848,7 +868,11 @@ var getAllTutor2 = async (req, res) => {
       categoryNames,
       minRating: minRating ? Number(minRating) : void 0
     });
-    res.status(200).json(result);
+    res.status(200).json({
+      success: true,
+      message: "All Tutor Fatched Succesfully",
+      data: result
+    });
   } catch (e) {
     res.status(400).json({
       error: "Could not get all tutors",
@@ -861,16 +885,22 @@ var getTutorByUser = async (req, res) => {
     const userId = req.user?.id;
     if (!userId) {
       return res.status(401).json({
-        error: "Unauthorized: user not logged in"
+        success: false,
+        message: "Unauthorized: user not logged in"
       });
     }
     const tutor = await TutorService.getTutorByUserId(userId);
     if (!tutor) {
       return res.status(404).json({
-        error: "Tutor profile not found for this user"
+        success: false,
+        mesage: "Tutor profile not found for this user"
       });
     }
-    res.status(200).json(tutor);
+    res.status(200).json({
+      success: true,
+      message: "tutor profile Fetch Succesfully ",
+      data: tutor
+    });
   } catch (error) {
     res.status(500).json({
       error: "Failed to get tutor",
@@ -882,17 +912,21 @@ var deleteTutorbyUserid = async (req, res) => {
   try {
     const userId = req.user?.id;
     if (!userId) {
-      throw new Error("User not found");
+      return res.status(400).json({
+        message: "User not found"
+      });
     }
     const tutor = await TutorService.getTutorByUserId(userId);
     if (!tutor) {
-      throw new Error("Tutor profile not found for this user");
+      return res.status(400).json({
+        message: "Tutor profile not found for this user"
+      });
     }
     if (tutor?.userId === userId) {
       const result = await TutorService.deleteTutorWithUser(userId);
       return res.status(200).json({
         message: "Tutor profile deleted successfully",
-        result
+        data: result
       });
     } else {
       return res.status(500).json({
@@ -902,6 +936,7 @@ var deleteTutorbyUserid = async (req, res) => {
     }
   } catch (error) {
     res.status(500).json({
+      success: false,
       error: "Failed to delete tutor",
       details: error
     });
@@ -913,18 +948,21 @@ var updateTutor = async (req, res) => {
     const userId = user?.id;
     if (!userId) {
       return res.status(401).json({
-        error: "Unauthorized not logged in"
+        success: false,
+        message: "Unauthorized not logged in"
       });
     }
     const tutor = await TutorService.getTutorByUserId(userId);
     if (!tutor) {
       return res.status(404).json({
-        error: "There is no tutor profile for  this user "
+        success: false,
+        message: "There is no tutor profile for  this user "
       });
     }
     if (tutor.userId !== userId) {
       return res.status(403).json({
-        error: "You are not authorized to update this tutor profile"
+        success: false,
+        message: "You are not authorized to update this tutor profile"
       });
     }
     const updatedTutor = await TutorService.updateTutorProfile(userId, req.body);
@@ -935,6 +973,7 @@ var updateTutor = async (req, res) => {
     });
   } catch (error) {
     res.status(500).json({
+      success: false,
       error: "Failed to update profile  ",
       details: error.message
     });
@@ -1198,11 +1237,13 @@ var createCategory = async (req, res) => {
     const { name } = req.body;
     if (!name) {
       return res.status(400).json({
+        success: false,
         message: "name field is requeard"
       });
     }
     if (typeof name !== "string") {
       return res.status(400).json({
+        success: false,
         message: " name must be a string"
       });
     }
@@ -1232,6 +1273,7 @@ var updateCategory = async (req, res) => {
     }
     if (typeof name !== "string") {
       return res.status(400).json({
+        success: false,
         message: " name must be a string"
       });
     }
@@ -1254,6 +1296,7 @@ var deleteCategory = async (req, res) => {
     const id = Number(req.params.id);
     if (isNaN(id)) {
       return res.status(400).json({
+        success: false,
         message: "id must be an number "
       });
     }
@@ -1458,12 +1501,13 @@ var getCurentUser = async (req, res) => {
     const userId = req.user?.id;
     if (!userId) {
       return res.status(400).json({
-        error: " Unauthorized!!!"
+        message: " Unauthorized!!!"
       });
     }
     const user = await userService.getCurentUserservice(userId);
     res.status(200).json({
       success: true,
+      message: " user Fatched Succesfully ",
       data: user
     });
   } catch (error) {
@@ -1479,7 +1523,7 @@ var getuserbyid = async (req, res) => {
     const userId = req.params.id;
     if (!userId) {
       return res.status(400).json({
-        error: " wrong  user id !!!"
+        message: " User Id is requierd !!!"
       });
     }
     const user = await userService.getuserbyIdService(userId);
@@ -1659,12 +1703,14 @@ var createBooking = async (req, res) => {
     const user = req?.user;
     if (!user) {
       return res.status(400).json({
-        error: "Unauthorized  login required  !! "
+        success: false,
+        message: "Unauthorized  login required  !! "
       });
     }
     if (user.role !== "STUDENT" /* STUDENT */) {
       return res.status(400).json({
-        error: "Unauthorized  Only student can book  a tutor  !!"
+        success: false,
+        message: "Unauthorized  Only student can book  a tutor  !!"
       });
     }
     const { tutorId, status } = req.body;
@@ -1762,7 +1808,8 @@ var getBookingByUserId = async (req, res) => {
     const user = req?.user;
     if (!user) {
       return res.status(400).json({
-        error: " Unauthorized  login required  !! "
+        success: false,
+        message: " Unauthorized  login required  !! "
       });
     }
     const bookings = await bookingService.getBookingByUserIdService(user.id);
@@ -1785,7 +1832,7 @@ var getAllBooking = async (req, res) => {
     if (user?.role !== "ADMIN" /* ADMIN */) {
       return res.status(400).json({
         success: false,
-        error: " Unauthorized  you are not an admin   !! "
+        message: " Unauthorized  you are not an admin   !! "
       });
     }
     const result = await bookingService.getAllBookingservice;
@@ -1814,11 +1861,15 @@ var getBookingById = async (req, res) => {
     }
     const booking = await bookingService.getBookingByBookingidService(id);
     if (!booking) {
-      return res.status(404).json({ error: "Booking not found" });
+      return res.status(404).json({
+        success: false,
+        message: "Booking not found"
+      });
     }
     if (booking.studentId !== user?.id) {
       return res.status(403).json({
-        error: "You are not allowed to view this booking"
+        success: false,
+        message: "You are not allowed to view this booking"
       });
     }
     res.status(200).json({
@@ -1979,26 +2030,31 @@ var createReview = async (req, res) => {
     const user = req?.user;
     if (!user) {
       return res.status(401).json({
+        success: false,
         message: "Unauthorized !!"
       });
     }
     if (user.role !== "STUDENT" /* STUDENT */) {
       return res.status(403).json({
+        success: false,
         message: " Only Student Can give  review "
       });
     }
     if (typeof tutorId !== "number" || typeof rating !== "number") {
       return res.status(400).json({
+        success: false,
         messsage: "Tutorid or rating  must be a Number"
       });
     }
     if (rating < 1 || rating > 5) {
       return res.status(400).json({
+        success: false,
         message: "Rating must be between 1 and 5"
       });
     }
     if (typeof comment !== "string" || comment.trim() === "") {
       return res.status(400).json({
+        success: false,
         message: "Comment is required and must be a non-empty string"
       });
     }
@@ -2021,6 +2077,7 @@ var getReviewsByTutorId = async (req, res) => {
     const tutorId = Number(req.params.tutorId);
     if (!tutorId) {
       return res.status(400).json({
+        success: false,
         message: "Tutor id is requard "
       });
     }
@@ -2042,6 +2099,7 @@ var getReviewByReviewid = async (req, res) => {
     const reviewId = Number(req.params.id);
     if (!reviewId) {
       return res.status(400).json({
+        success: false,
         message: "reviewId is is requard "
       });
     }
@@ -2088,27 +2146,32 @@ var updateReview = async (req, res) => {
     const studentId = req.user?.id;
     if (typeof tutorId !== "number" || typeof rating !== "number") {
       return res.status(400).json({
+        success: false,
         message: "tutor id and rating must be an nubmber "
       });
     }
     if (rating < 1 || rating > 5) {
       return res.status(400).json({
+        success: false,
         message: "Rating must be between 1 and 5"
       });
     }
     if (typeof comment !== "string" || comment.trim() === "") {
       return res.status(400).json({
+        success: false,
         message: "Comment is required and must be a non-empty string"
       });
     }
     if (!studentId || req.user?.role !== "STUDENT" /* STUDENT */) {
       return res.status(403).json({
+        success: false,
         message: "Unauthorized "
       });
     }
     const review = await reviewService.updateReviewService(studentId, tutorId, rating, comment);
     res.status(200).json({
       success: true,
+      message: "Review update succesfully",
       data: review
     });
   } catch (e) {

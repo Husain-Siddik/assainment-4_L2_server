@@ -7,8 +7,8 @@ import { Request, Response } from "express";
 import { UserRole } from "../../middlewares/authorizeRoles";
 
 import { reviewService } from './review.service';
-import { success } from "better-auth/*";
-import { json } from "node:stream/consumers";
+
+
 
 
 
@@ -22,6 +22,7 @@ const createReview = async (req: Request, res: Response) => {
 
         if (!user) {
             return res.status(401).json({
+                success: false,
                 message: "Unauthorized !!"
             })
 
@@ -30,6 +31,7 @@ const createReview = async (req: Request, res: Response) => {
         if (user.role !== UserRole.STUDENT) {
 
             return res.status(403).json({
+                success: false,
                 message: " Only Student Can give  review "
             })
 
@@ -38,6 +40,7 @@ const createReview = async (req: Request, res: Response) => {
 
         if (typeof tutorId !== "number" || typeof rating !== "number") {
             return res.status(400).json({
+                success: false,
                 messsage: "Tutorid or rating  must be a Number"
             })
 
@@ -45,12 +48,14 @@ const createReview = async (req: Request, res: Response) => {
 
         if (rating < 1 || rating > 5) {
             return res.status(400).json({
+                success: false,
                 message: "Rating must be between 1 and 5"
             });
         }
 
         if (typeof comment !== "string" || comment.trim() === "") {
             return res.status(400).json({
+                success: false,
                 message: "Comment is required and must be a non-empty string"
             })
 
@@ -88,6 +93,7 @@ const getReviewsByTutorId = async (req: Request, res: Response) => {
         if (!tutorId) {
 
             return res.status(400).json({
+                success: false,
                 message: "Tutor id is requard "
             })
         }
@@ -120,6 +126,7 @@ const getReviewByReviewid = async (req: Request, res: Response) => {
         if (!reviewId) {
 
             return res.status(400).json({
+                success: false,
                 message: "reviewId is is requard "
             })
         }
@@ -201,6 +208,7 @@ const updateReview = async (req: Request, res: Response) => {
         if (typeof tutorId !== "number" || typeof rating !== "number") {
 
             return res.status(400).json({
+                success: false,
                 message: "tutor id and rating must be an nubmber "
             })
         }
@@ -208,12 +216,14 @@ const updateReview = async (req: Request, res: Response) => {
 
         if (rating < 1 || rating > 5) {
             return res.status(400).json({
+                success: false,
                 message: "Rating must be between 1 and 5"
             });
         }
 
         if (typeof comment !== "string" || comment.trim() === "") {
             return res.status(400).json({
+                success: false,
                 message: "Comment is required and must be a non-empty string"
             })
 
@@ -221,6 +231,7 @@ const updateReview = async (req: Request, res: Response) => {
 
         if (!studentId || req.user?.role !== UserRole.STUDENT) {
             return res.status(403).json({
+                success: false,
                 message: "Unauthorized "
             })
         }
@@ -230,6 +241,7 @@ const updateReview = async (req: Request, res: Response) => {
         const review = await reviewService.updateReviewService(studentId, tutorId, rating, comment);
         res.status(200).json({
             success: true,
+            message: "Review update succesfully",
             data: review
         });
     } catch (e: any) {

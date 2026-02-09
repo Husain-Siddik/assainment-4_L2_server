@@ -1,4 +1,4 @@
-import { string, success } from 'better-auth/*';
+
 import { Category, User } from './../../../generated/prisma/client';
 
 import { Request, Response } from "express";
@@ -74,6 +74,7 @@ const createCategory = async (req: Request, res: Response) => {
 
         if (!name) {
             return res.status(400).json({
+                success: false,
                 message: "name field is requeard"
             })
 
@@ -81,6 +82,7 @@ const createCategory = async (req: Request, res: Response) => {
 
         if (typeof name !== "string") {
             return res.status(400).json({
+                success: false,
                 message: " name must be a string"
             })
 
@@ -126,6 +128,7 @@ const updateCategory = async (req: Request, res: Response) => {
 
         if (typeof name !== "string") {
             return res.status(400).json({
+                success: false,
                 message: " name must be a string"
             })
 
@@ -162,6 +165,7 @@ const deleteCategory = async (req: Request, res: Response) => {
 
         if (isNaN(id)) {
             return res.status(400).json({
+                success: false,
                 message: "id must be an number "
             })
 

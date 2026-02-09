@@ -130,7 +130,7 @@ const getCurentUser = async (req: Request, res: Response) => {
 
         if (!userId) {
             return res.status(400).json({
-                error: " Unauthorized!!!",
+                message: " Unauthorized!!!",
             });
         }
 
@@ -138,6 +138,7 @@ const getCurentUser = async (req: Request, res: Response) => {
 
         res.status(200).json({
             success: true,
+            message: " user Fatched Succesfully ",
             data: user,
         });
 
@@ -159,7 +160,7 @@ const getuserbyid = async (req: Request, res: Response) => {
 
         if (!userId) {
             return res.status(400).json({
-                error: " wrong  user id !!!",
+                message: " User Id is requierd !!!",
             });
         }
 
